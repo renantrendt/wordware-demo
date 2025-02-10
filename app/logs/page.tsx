@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { LogsTable } from "@/components/logs-table"
 import { Input } from "@/components/ui/input"
 import { Search } from "lucide-react"
-import { createClient } from '@supabase/supabase-js'
+import { supabase } from '@/lib/supabase'
 import { Database } from '@/types/supabase'
 
 interface LogEntry {
@@ -20,11 +20,7 @@ export default function LogsPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [isLoading, setIsLoading] = useState(true)
 
-  // Inicializar cliente do Supabase
-  const supabase = createClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  )
+  // O cliente Supabase já está importado no topo do arquivo
 
   // Carregar logs iniciais
   useEffect(() => {

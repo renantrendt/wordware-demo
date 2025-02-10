@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useMemo, useEffect } from "react"
-import { createClient } from '@supabase/supabase-js'
+import { supabase } from '@/lib/supabase'
 import { Database } from '@/types/supabase'
 
 // Converte o sentiment score do Wordware em High/Medium/Low

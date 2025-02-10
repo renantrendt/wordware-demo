@@ -1,6 +1,8 @@
-import { redirect } from "next/navigation"
-
 export default function Home() {
-  redirect("/companies")
+  return (
+    <div className="flex items-center justify-center h-full">
+      <h1 className="text-2xl font-bold">Loading...</h1>
+    </div>
+  )
 }
 
