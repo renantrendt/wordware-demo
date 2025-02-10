@@ -1,7 +1,14 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useBeacons } from '@/contexts/beacon-context'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { TrendLine } from "./trend-line"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -47,6 +54,7 @@ interface DetailsSidebarProps {
 }
 
 export function DetailsSidebar({ isOpen, onClose, company, onNavigate, hasPrevious, hasNext }: DetailsSidebarProps) {
+  const { showTimelineBeacon, setShowTimelineBeacon } = useBeacons()
   const [isGraphLoaded, setIsGraphLoaded] = useState(false)
   const [isIntentTrendExpanded, setIsIntentTrendExpanded] = useState(true)
   const [isTimelineExpanded, setIsTimelineExpanded] = useState(true)
@@ -207,32 +215,45 @@ export function DetailsSidebar({ isOpen, onClose, company, onNavigate, hasPrevio
               <div className="flex justify-between items-center mb-4">
                 <div className="flex items-center gap-1">
                   <h2 className="text-xl font-semibold text-white">Timeline</h2>
-                  {company.name === "QuantumLeap AI" && (
-                    <div 
-                      className="ml-1 cursor-pointer" 
-                      onClick={() => {
-                        const timelineSection = document.getElementById('timeline-section')
-                        if (timelineSection) {
-                          timelineSection.scrollIntoView({ behavior: 'smooth', block: 'center' })
-                          // Expand timeline if not expanded
-                          setIsTimelineExpanded(true)
-                          // Find and expand the first Support Inquiry
-                          if (company.timeline && company.timeline.length > 0) {
-                            const supportInquiry = company.timeline.find(item => item.title === 'Support Inquiry')
-                            if (supportInquiry) {
-                              setExpandedTimelineItems(prev => [...prev, supportInquiry.id])
-                            }
-                          }
-                        }
-                      }}
-                    >
-                      <div className="relative flex items-center justify-center">
-                        {/* Outer ring with animation */}
-                        <div className="absolute w-4 h-4 bg-white rounded-full opacity-20 animate-ping" />
-                        {/* Inner dot */}
-                        <div className="relative w-3 h-3 bg-white rounded-full opacity-60" />
-                      </div>
-                    </div>
+                  {company.name === "QuantumLeap AI" && showTimelineBeacon && (
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div 
+                            className="ml-1 cursor-pointer" 
+                            onClick={() => {
+                              setShowTimelineBeacon(false)
+                              const timelineSection = document.getElementById('timeline-section')
+                              if (timelineSection) {
+                                timelineSection.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                                // Expand timeline if not expanded
+                                setIsTimelineExpanded(true)
+                                // Find and expand the first Support Inquiry
+                                if (company.timeline && company.timeline.length > 0) {
+                                  const supportInquiry = company.timeline.find(item => item.title === 'Support Inquiry')
+                                  if (supportInquiry) {
+                                    setExpandedTimelineItems(prev => [...prev, supportInquiry.id])
+                                  }
+                                }
+                              }
+                            }}
+                          >
+                            <div className="relative flex items-center justify-center">
+                              {/* Outer ring with animation */}
+                              <div className="absolute w-4 h-4 bg-white rounded-full opacity-40 animate-ping" />
+                              {/* Inner dot */}
+                              <div className="relative w-3 h-3 bg-white rounded-full opacity-90" />
+                            </div>
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent 
+                          side="right"
+                          className="bg-[#1A1A1A] text-white border-[#2F2F2F] text-sm max-w-[200px]"
+                        >
+                          View support inquiries and timeline
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                   )}
                 </div>
                 <ChevronDown

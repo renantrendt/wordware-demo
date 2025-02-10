@@ -2,6 +2,13 @@
 
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table"
 import { useState } from "react"
+import { useBeacons } from '@/contexts/beacon-context'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 // import { SourceIcon } from "./source-icon"
 import { TrendLine } from "./trend-line"
 import Image from "next/image"
@@ -78,6 +85,7 @@ const DraggableTableHead = ({ columnId, onColumnReorder, className = "" }) => {
 }
 
 export function CompaniesTable({ companies, selectedColumns, onRowClick, onColumnReorder }: CompaniesTableProps) {
+  const { showSentimentBeacon, setShowSentimentBeacon } = useBeacons()
   return (
     <DndProvider backend={HTML5Backend}>
       <div className="overflow-x-auto -mx-6 whitespace-nowrap">
@@ -161,15 +169,30 @@ export function CompaniesTable({ companies, selectedColumns, onRowClick, onColum
                         >
                           {typeof company.sentiment === 'number' ? `${(company.sentiment * 100).toFixed(0)}%` : '-'}
                         </span>
-                        {company.name === "QuantumLeap AI" && (
-                          <div className="ml-1">
-                            <div className="relative flex items-center justify-center">
-                              {/* Outer ring with animation */}
-                              <div className="absolute w-4 h-4 bg-white rounded-full opacity-20 animate-ping" />
-                              {/* Inner dot */}
-                              <div className="relative w-3 h-3 bg-white rounded-full opacity-60" />
-                            </div>
-                          </div>
+                        {company.name === "QuantumLeap AI" && showSentimentBeacon && (
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <div 
+                                  className="ml-1 cursor-pointer" 
+                                  onClick={() => setShowSentimentBeacon(false)}
+                                >
+                                  <div className="relative flex items-center justify-center">
+                                    {/* Outer ring with animation */}
+                                    <div className="absolute w-4 h-4 bg-white rounded-full opacity-40 animate-ping" />
+                                    {/* Inner dot */}
+                                    <div className="relative w-3 h-3 bg-white rounded-full opacity-90" />
+                                  </div>
+                                </div>
+                              </TooltipTrigger>
+                              <TooltipContent 
+                                side="right"
+                                className="bg-[#1A1A1A] text-white border-[#2F2F2F] text-sm whitespace-nowrap"
+                              >
+                                View customer real-time sentiment
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
                         )}
                       </div>
                     )}

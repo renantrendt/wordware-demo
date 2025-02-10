@@ -5,6 +5,7 @@ import { Sidebar } from "@/components/sidebar"
 import { Header } from "@/components/header"
 import { CrispChat } from "@/components/crisp-chat"
 import { ProductTour } from "@/components/product-tour"
+import { BeaconProvider } from "@/contexts/beacon-context"
 import type React from "react"
 
 const inter = Inter({
@@ -25,7 +26,8 @@ export default function RootLayout({
   return (
     <html lang="en" className={`dark ${inter.variable}`}>
       <body>
-        <div className="flex h-screen bg-[#121212] text-white font-inter">
+        <BeaconProvider>
+          <div className="flex h-screen bg-[#121212] text-white font-inter">
           <Sidebar />
           <div className="flex-1 flex flex-col overflow-hidden">
             <Header />
@@ -33,7 +35,8 @@ export default function RootLayout({
           </div>
           <CrispChat />
           <ProductTour />
-        </div>
+          </div>
+        </BeaconProvider>
       </body>
     </html>
   )
