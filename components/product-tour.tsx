@@ -2,17 +2,17 @@
 
 import { useEffect, useState } from 'react'
 import { cn } from '@/lib/utils'
+import { useRouter } from 'next/navigation'
 
 interface BeaconProps {
-  position: 'details' | 'logs' | 'crisp'
+  position: 'logs' | 'crisp'
   onClick?: () => void
   className?: string
 }
 
 const beaconPositions = {
-  details: 'fixed right-[20px] top-[80px] z-50', // Next to the details sidebar
-  logs: 'fixed left-[20px] bottom-[20px] z-50', // Next to Logs in sidebar
-  crisp: 'fixed right-[20px] bottom-[100px] z-50' // Next to Crisp chat widget
+  logs: 'fixed left-[100px] bottom-[20px] z-50', // Next to Logs in sidebar
+  crisp: 'fixed right-[130px] bottom-[80px] z-50' // Next to Crisp chat widget
 }
 
 function Beacon({ position, onClick, className }: BeaconProps) {
@@ -36,31 +36,29 @@ function Beacon({ position, onClick, className }: BeaconProps) {
 }
 
 export function ProductTour() {
-  const [activeBeacons, setActiveBeacons] = useState<BeaconProps['position'][]>([
-    'details',
-    'logs',
-    'crisp'
-  ])
+  const router = useRouter()
+  const beaconPositions: BeaconProps['position'][] = ['logs', 'crisp']
 
   const handleBeaconClick = (position: BeaconProps['position']) => {
-    // Remove the clicked beacon from active beacons
-    setActiveBeacons(prev => prev.filter(p => p !== position))
-
-    // Simulate click on the underlying element based on position
-    if (position === 'sentiment') {
-      // Find and click the QuantumLeap AI sentiment cell
-      const sentimentCells = document.querySelectorAll('[data-company="QuantumLeap AI"] [data-column="sentiment"]')
-      sentimentCells[0]?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+    if (position === 'crisp') {
+      // @ts-ignore - Crisp is added via script
+      if (window.$crisp) {
+        // @ts-ignore
+        window.$crisp.push(['do', 'chat:open'])
+      }
+    } else if (position === 'logs') {
+      router.push('/logs')
     }
   }
 
   return (
     <>
-      {activeBeacons.map(position => (
+      {beaconPositions.map(position => (
         <Beacon
           key={position}
           position={position}
           onClick={() => handleBeaconClick(position)}
+          className="cursor-pointer"
         />
       ))}
     </>

@@ -50,6 +50,7 @@ export function DetailsSidebar({ isOpen, onClose, company, onNavigate, hasPrevio
   const [isGraphLoaded, setIsGraphLoaded] = useState(false)
   const [isIntentTrendExpanded, setIsIntentTrendExpanded] = useState(true)
   const [isTimelineExpanded, setIsTimelineExpanded] = useState(true)
+  const [expandedTimelineItems, setExpandedTimelineItems] = useState<string[]>([])
 
   useEffect(() => {
     if (isOpen && company) {
@@ -204,7 +205,36 @@ export function DetailsSidebar({ isOpen, onClose, company, onNavigate, hasPrevio
 
             <div>
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold text-white">Timeline</h2>
+                <div className="flex items-center gap-1">
+                  <h2 className="text-xl font-semibold text-white">Timeline</h2>
+                  {company.name === "QuantumLeap AI" && (
+                    <div 
+                      className="ml-1 cursor-pointer" 
+                      onClick={() => {
+                        const timelineSection = document.getElementById('timeline-section')
+                        if (timelineSection) {
+                          timelineSection.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                          // Expand timeline if not expanded
+                          setIsTimelineExpanded(true)
+                          // Find and expand the first Support Inquiry
+                          if (company.timeline && company.timeline.length > 0) {
+                            const supportInquiry = company.timeline.find(item => item.title === 'Support Inquiry')
+                            if (supportInquiry) {
+                              setExpandedTimelineItems(prev => [...prev, supportInquiry.id])
+                            }
+                          }
+                        }
+                      }}
+                    >
+                      <div className="relative flex items-center justify-center">
+                        {/* Outer ring with animation */}
+                        <div className="absolute w-4 h-4 bg-white rounded-full opacity-20 animate-ping" />
+                        {/* Inner dot */}
+                        <div className="relative w-3 h-3 bg-white rounded-full opacity-60" />
+                      </div>
+                    </div>
+                  )}
+                </div>
                 <ChevronDown
                   className={`h-5 w-5 cursor-pointer transition-transform ${isTimelineExpanded ? "rotate-180" : ""}`}
                   onClick={() => setIsTimelineExpanded(!isTimelineExpanded)}
@@ -212,7 +242,7 @@ export function DetailsSidebar({ isOpen, onClose, company, onNavigate, hasPrevio
               </div>
               {isTimelineExpanded && (
                 <>
-                  <Card className="bg-[#1A1A1A] border-[#2F2F2F] mb-4">
+                  <Card id="timeline-section" className="bg-[#1A1A1A] border-[#2F2F2F] mb-4">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-lg font-medium text-white">Support Tickets Opened</CardTitle>
                     </CardHeader>
@@ -224,7 +254,19 @@ export function DetailsSidebar({ isOpen, onClose, company, onNavigate, hasPrevio
                   </Card>
                   <div className="space-y-4">
                     {company.timeline && company.timeline.length > 0 ? (
-                      company.timeline.map((item) => <TimelineCard key={item.id} item={item} />)
+                      company.timeline.map((item) => (
+                        <TimelineCard 
+                          key={item.id} 
+                          item={item} 
+                          isExpanded={expandedTimelineItems.includes(item.id)}
+                          onToggleExpand={(id) => {
+                            setExpandedTimelineItems(prev =>
+                              prev.includes(id) 
+                                ? prev.filter(i => i !== id)
+                                : [...prev, id]
+                            )
+                          }}
+                        />))
                     ) : (
                       <Card className="bg-[#1A1A1A] border-[#2F2F2F]">
                         <CardContent className="py-6">

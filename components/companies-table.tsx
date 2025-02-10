@@ -162,7 +162,7 @@ export function CompaniesTable({ companies, selectedColumns, onRowClick, onColum
                           {typeof company.sentiment === 'number' ? `${(company.sentiment * 100).toFixed(0)}%` : '-'}
                         </span>
                         {company.name === "QuantumLeap AI" && (
-                          <div className="group cursor-pointer ml-1">
+                          <div className="ml-1">
                             <div className="relative flex items-center justify-center">
                               {/* Outer ring with animation */}
                               <div className="absolute w-4 h-4 bg-white rounded-full opacity-20 animate-ping" />
