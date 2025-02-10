@@ -23,6 +23,7 @@ import {
 import { useState } from "react"
 
 const activeRoutes = ["/companies", "/people", "/logs"]
+const isRouteEnabled = (href: string) => activeRoutes.includes(href)
 
 const routes = [
   {
@@ -157,22 +158,22 @@ export function Sidebar() {
                 {section.items.map((item) => (
                   <li key={item.href}>
                     <Link
-                      href={item.href}
+                      href={isRouteEnabled(item.href) ? item.href : '#'}
                       className={cn(
                         "flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors relative h-9",
-                        "hover:bg-[#252525]",
+                        isRouteEnabled(item.href) ? "hover:bg-[#252525]" : "cursor-not-allowed opacity-50",
                         pathname === item.href
                           ? "bg-[#171717] text-white"
-                          : activeRoutes.includes(item.href)
+                          : isRouteEnabled(item.href)
                             ? "text-gray-400"
-                            : "text-[#303030] hover:text-[#404040]",
+                            : "text-[#303030]",
                         isCollapsed && "justify-center px-2",
                       )}
                     >
                       <item.icon className={cn(
                         "h-5 w-5 flex-shrink-0",
                         isCollapsed ? "mr-0" : "mr-3",
-                        !activeRoutes.includes(item.href) && "opacity-50"
+                        !isRouteEnabled(item.href) && "opacity-50"
                       )} />
                       <span className={cn("transition-opacity duration-300", isCollapsed && "opacity-0 absolute")}>
                         {item.label}
