@@ -9,6 +9,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 
 interface BeaconProps {
   position: 'logs' | 'crisp' | 'restart'
@@ -60,8 +62,42 @@ function Beacon({ position, onClick, className }: BeaconProps) {
   )
 }
 
+function WelcomeModal({ onClose }: { onClose: () => void }) {
+  return (
+    <div className="fixed inset-0 z-50 bg-black/30" style={{ backdropFilter: 'blur(3px)' }}>
+      <div className="fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4">
+        <Card className="border-neutral-800 bg-neutral-900/80 backdrop-blur-md text-white">
+          <CardHeader>
+            <CardTitle>Welcome to the Sentiment Dashboard</CardTitle>
+            <CardDescription className="text-neutral-400">
+              This dashboard tracks customer sentiment in real-time.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+          <p className="mb-4 text-sm text-neutral-400">
+          I added a Crisp chat so you can impersonate a user and see the changing sentiment all in one place. You can also access the API calls.
+            </p>
+            <p className="mb-4 text-sm text-neutral-400">
+              <strong className="text-white">Roadmap:</strong> Track sentiment throughout the month and aggregate the overall average per company.
+            </p>
+            <div className="flex justify-end">
+              <Button
+                onClick={onClose}
+                variant="default"
+              >
+                Get Started
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  )
+}
+
 export function ProductTour() {
   const router = useRouter()
+  const [showWelcomeModal, setShowWelcomeModal] = useState(true)
   const [visibleBeacons, setVisibleBeacons] = useState<BeaconProps['position'][]>(['logs', 'crisp', 'restart'])
 
   const handleBeaconClick = (position: BeaconProps['position']) => {
@@ -85,6 +121,7 @@ export function ProductTour() {
 
   return (
     <>
+      {showWelcomeModal && <WelcomeModal onClose={() => setShowWelcomeModal(false)} />}
       {visibleBeacons.map(position => (
         <Beacon
           key={position}
