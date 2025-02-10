@@ -147,14 +147,16 @@ export function CompaniesTable({ companies, selectedColumns, onRowClick, onColum
                       <div className="flex justify-start w-full">
                         <span
                           className={`px-2.5 py-1 rounded-full text-sm ${
-                            company.sentiment >= 0.7
-                              ? "bg-[#2B1D13] text-[#FFA066]"
-                              : company.sentiment >= 0.4
-                                ? "bg-[#1A1D2B] text-[#7B93FF]"
-                                : "bg-[#1A1A1A] text-[#909090]"
+                            typeof company.sentiment === 'number'
+                              ? company.sentiment >= 0.7
+                                ? "bg-[#2B1D13] text-[#FFA066]"
+                                : company.sentiment >= 0.4
+                                  ? "bg-[#1A1D2B] text-[#7B93FF]"
+                                  : "bg-[#1A1A1A] text-[#909090]"
+                              : "bg-[#1A1A1A] text-[#909090]"
                           }`}
                         >
-                          {(company.sentiment * 100).toFixed(0)}%
+                          {typeof company.sentiment === 'number' ? `${(company.sentiment * 100).toFixed(0)}%` : '-'}
                         </span>
                       </div>
                     )}
