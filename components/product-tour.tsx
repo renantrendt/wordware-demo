@@ -4,13 +4,12 @@ import { useEffect, useState } from 'react'
 import { cn } from '@/lib/utils'
 
 interface BeaconProps {
-  position: 'sentiment' | 'details' | 'logs' | 'crisp'
+  position: 'details' | 'logs' | 'crisp'
   onClick?: () => void
   className?: string
 }
 
 const beaconPositions = {
-  sentiment: 'absolute left-[530px] top-[195px] z-50', // Next to QuantumLeap AI's sentiment
   details: 'fixed right-[20px] top-[80px] z-50', // Next to the details sidebar
   logs: 'fixed left-[20px] bottom-[20px] z-50', // Next to Logs in sidebar
   crisp: 'fixed right-[20px] bottom-[100px] z-50' // Next to Crisp chat widget
@@ -38,7 +37,6 @@ function Beacon({ position, onClick, className }: BeaconProps) {
 
 export function ProductTour() {
   const [activeBeacons, setActiveBeacons] = useState<BeaconProps['position'][]>([
-    'sentiment',
     'details',
     'logs',
     'crisp'

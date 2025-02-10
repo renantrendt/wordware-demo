@@ -1,6 +1,7 @@
 "use client"
 
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table"
+import { useState } from "react"
 // import { SourceIcon } from "./source-icon"
 import { TrendLine } from "./trend-line"
 import Image from "next/image"
@@ -146,7 +147,7 @@ export function CompaniesTable({ companies, selectedColumns, onRowClick, onColum
                       </div>
                     )}
                     {columnId === "sentiment" && (
-                      <div className="flex justify-start w-full">
+                      <div className="flex items-center gap-1 w-full">
                         <span
                           className={`px-2.5 py-1 rounded-full text-sm ${
                             typeof company.sentiment === 'number'
@@ -160,6 +161,16 @@ export function CompaniesTable({ companies, selectedColumns, onRowClick, onColum
                         >
                           {typeof company.sentiment === 'number' ? `${(company.sentiment * 100).toFixed(0)}%` : '-'}
                         </span>
+                        {company.name === "QuantumLeap AI" && (
+                          <div className="group cursor-pointer ml-1">
+                            <div className="relative flex items-center justify-center">
+                              {/* Outer ring with animation */}
+                              <div className="absolute w-4 h-4 bg-white rounded-full opacity-20 animate-ping" />
+                              {/* Inner dot */}
+                              <div className="relative w-3 h-3 bg-white rounded-full opacity-60" />
+                            </div>
+                          </div>
+                        )}
                       </div>
                     )}
                     {columnId === "activeProjects" && <span className="text-sm">{company.activeProjects}</span>}
