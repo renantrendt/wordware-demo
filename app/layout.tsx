@@ -4,6 +4,7 @@ import "./globals.css"
 import { Sidebar } from "@/components/sidebar"
 import { Header } from "@/components/header"
 import { CrispChat } from "@/components/crisp-chat"
+import { ProductTour } from "@/components/product-tour"
 import type React from "react"
 
 const inter = Inter({
@@ -31,6 +32,7 @@ export default function RootLayout({
             <main className="flex-1 overflow-auto">{children}</main>
           </div>
           <CrispChat />
+          <ProductTour />
         </div>
       </body>
     </html>

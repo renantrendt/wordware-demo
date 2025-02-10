@@ -99,11 +99,13 @@ export function CompaniesTable({ companies, selectedColumns, onRowClick, onColum
                 key={company.name}
                 className="cursor-pointer hover:bg-[#1a1a1a] border-b border-[#1f1f1f]"
                 onClick={() => onRowClick(company)}
+                data-company={company.name}
               >
                 {selectedColumns.map((columnId, index) => (
                   <TableCell
                     key={columnId}
                     className={`pl-6 py-3.5 whitespace-nowrap ${columnWidths[columnId]} ${index === 0 ? "pl-6" : ""}`}
+                    data-column={columnId}
                   >
                     {columnId === "name" && (
                       <div className="flex items-center space-x-2">
