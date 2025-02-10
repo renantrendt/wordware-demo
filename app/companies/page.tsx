@@ -138,29 +138,12 @@ const initialCompanies: Company[] = [
 ]
 
 export default function CompaniesPage() {
-  console.log("Rendering CompaniesPage")
-  
-  useEffect(() => {
-    console.log("CompaniesPage mounted")
-    console.log("Environment variables:", {
-      hasSupabaseUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
-      hasSupabaseKey: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-    })
-    
-    return () => {
-      console.log("CompaniesPage unmounted")
-    }
-  }, [])
   const [companies, setCompanies] = useState(initialCompanies)
   const [searchQuery, setSearchQuery] = useState("")
   const [sortColumn, setSortColumn] = useState("lastActivity")
 
   // Busca o último sentiment_score a cada 5 segundos
   useEffect(() => {
-    const supabase = createClient<Database>(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    )
 
     const fetchSentiment = async () => {
       try {

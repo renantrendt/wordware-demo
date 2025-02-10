@@ -1,13 +1,9 @@
-import { createClient } from '@supabase/supabase-js'
+import { supabase } from '@/lib/supabase'
 import { Database } from '@/types/supabase'
 
 export const runtime = 'edge'
 
 export async function GET() {
-  const supabase = createClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  )
 
   const stream = new ReadableStream({
     start: async (controller) => {

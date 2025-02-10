@@ -20,7 +20,7 @@ export default function LogsPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [isLoading, setIsLoading] = useState(true)
 
-  // O cliente Supabase já está importado no topo do arquivo
+  // Inicializar cliente do Supabase
 
   // Carregar logs iniciais
   useEffect(() => {
