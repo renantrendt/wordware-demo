@@ -66,7 +66,7 @@ function WelcomeModal({ onClose }: { onClose: () => void }) {
   return (
     <div className="fixed inset-0 z-50 bg-black/30" style={{ backdropFilter: 'blur(3px)' }}>
       <div className="fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4">
-        <Card className="border-neutral-800 bg-neutral-900/80 backdrop-blur-md text-white">
+        <Card className="border-neutral-800 bg-neutral-900/80 backdrop-blur-md text-white max-h-[80vh] overflow-y-auto">
           <CardHeader>
             <CardTitle>Read me first</CardTitle>
             <CardDescription className="text-neutral-400">
@@ -89,6 +89,17 @@ function WelcomeModal({ onClose }: { onClose: () => void }) {
             <p className="mb-4 text-sm text-neutral-400">
               <strong className="text-white">Wordware Teammate:</strong> You work at Wordware and today you are focused on determining if some customers are at risk of churning. You begin by analyzing the sentiment and summary of the previous ticket from the company QuantumLeap.
             </p>
+            <div className="mb-4 text-xs text-neutral-300">
+              <p className="mb-2">Built with:</p>
+              <ul className="list-none space-y-1">
+                <li>• Framework: Next.js, React, TypeScript</li>
+                <li>• UI: Tailwind, shadcn/ui, React DND, Tremor</li>
+                <li>• Database: Supabase</li>
+                <li>• Infrastructure: Vercel (Hosting & API Routes)</li>
+                <li>• Integration: Wordware API (sentiment analysis), Crisp (webhooks)</li>
+                <li>• Development: Windsurf IDE</li>
+              </ul>
+            </div>
             <div className="flex justify-end">
               <Button
                 onClick={onClose}
