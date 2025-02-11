@@ -90,14 +90,16 @@ function WelcomeModal({ onClose }: { onClose: () => void }) {
               <strong className="text-white">Wordware Teammate:</strong> You work at Wordware and today you are focused on determining if some customers are at risk of churning. You begin by analyzing the sentiment and summary of the previous ticket from the company QuantumLeap.
             </p>
             <div className="mb-4 text-xs text-neutral-300">
-              <p className="mb-2">Built with:</p>
+              <p className="mb-2">Built in 31 hours using:</p>
               <ul className="list-none space-y-1">
                 <li>• Framework: Next.js, React, TypeScript</li>
                 <li>• UI: Tailwind, shadcn/ui, React DND, Tremor</li>
                 <li>• Database: Supabase</li>
                 <li>• Infrastructure: Vercel (Hosting & API Routes)</li>
-                <li>• Integration: Wordware API (sentiment analysis), Crisp (webhooks)</li>
+                <li>• Connected Services: Crispchat</li>
+                <li>• AI Stack: Wordware.ai</li>
                 <li>• Development: Windsurf IDE</li>
+
               </ul>
             </div>
             <div className="flex justify-end">
