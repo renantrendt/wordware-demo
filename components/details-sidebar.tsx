@@ -257,7 +257,6 @@ export function DetailsSidebar({ isOpen, onClose, company, onNavigate, hasPrevio
                                 if (ticketSummaries.length > 0) {
                                   setExpandedTimelineItems(ticketSummaries.map(summary => summary.timestamp))
                                 }
-                                }
                               }
                             }}
                           >
