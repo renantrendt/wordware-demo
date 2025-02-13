@@ -15,10 +15,13 @@ interface TimelineItem {
 
 interface TimelineCardProps {
   item: TimelineItem
+  isExpanded?: boolean
+  onToggleExpand?: (id: string) => void
 }
 
-export function TimelineCard({ item }: TimelineCardProps) {
-  const [isExpanded, setIsExpanded] = useState(false)
+export function TimelineCard({ item, isExpanded: controlledExpanded, onToggleExpand }: TimelineCardProps) {
+  const [localExpanded, setLocalExpanded] = useState(false)
+  const isExpanded = controlledExpanded ?? localExpanded
   const [comment, setComment] = useState("")
 
   const handleCommentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -44,7 +47,13 @@ export function TimelineCard({ item }: TimelineCardProps) {
       </CardHeader>
       <CardContent>
         <div
-          onClick={() => setIsExpanded(!isExpanded)}
+          onClick={() => {
+            if (onToggleExpand) {
+              onToggleExpand(item.id)
+            } else {
+              setLocalExpanded(!localExpanded)
+            }
+          }}
           className="flex items-center justify-between w-full cursor-pointer text-muted-foreground hover:text-white"
         >
           <span className="text-sm">{item.timestamp}</span>
