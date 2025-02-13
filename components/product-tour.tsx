@@ -75,7 +75,8 @@ function WelcomeModal({ onClose }: { onClose: () => void }) {
           </CardHeader>
           <CardContent>
           <p className="mb-4 text-sm text-neutral-400">
-          Currently, the only operational features are the sentiment analysis you can find it at the cell sentiment inside companies page; timeline with real-time chart showing messages received per day and daily support tickets summarization with action; API logs on the logs page.
+
+          Currently, the only operational features are the sentiment analysis you can find it at the cell sentiment inside companies page; timeline with real-time chart showing messages received per day and daily support tickets summarization with action, inside company QuantumLeap details; API logs on the logs page.
             </p>
             <p className="mb-4 text-sm text-neutral-400">
             Tip: The flashing beacons are the parts of the software that are working, you can hover over them to understand their functionality.
