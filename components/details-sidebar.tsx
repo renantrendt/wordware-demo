@@ -62,7 +62,10 @@ export function DetailsSidebar({ isOpen, onClose, company, onNavigate, hasPrevio
   const [isIntentTrendExpanded, setIsIntentTrendExpanded] = useState(true)
   const [isTimelineExpanded, setIsTimelineExpanded] = useState(true)
   const [expandedTimelineItems, setExpandedTimelineItems] = useState<string[]>([])
+<<<<<<< HEAD
   const ticketSummaries = useTicketSummaries()
+=======
+>>>>>>> feature/product-tour
 
   useEffect(() => {
     if (isOpen && company) {
@@ -267,7 +270,7 @@ export function DetailsSidebar({ isOpen, onClose, company, onNavigate, hasPrevio
               </div>
               {isTimelineExpanded && (
                 <>
-                  <Card className="bg-[#1A1A1A] border-[#2F2F2F] mb-4">
+                  <Card id="timeline-section" className="bg-[#1A1A1A] border-[#2F2F2F] mb-4">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-lg font-medium text-white">Support Messages Received</CardTitle>
                     </CardHeader>
@@ -278,7 +281,7 @@ export function DetailsSidebar({ isOpen, onClose, company, onNavigate, hasPrevio
                     </CardContent>
                   </Card>
                   <div className="space-y-4">
-                    {/* Ticket Summaries */}
+                    {/* Daily Support Summaries */}
                     {ticketSummaries.map((summary) => (
                       <TimelineCard
                         key={summary.timestamp}
@@ -290,8 +293,39 @@ export function DetailsSidebar({ isOpen, onClose, company, onNavigate, hasPrevio
                           summary: summary.message_content,
                           payload: summary.payload
                         }}
+                        isExpanded={expandedTimelineItems.includes(summary.timestamp)}
+                        onToggleExpand={(id) => {
+                          setExpandedTimelineItems(prev =>
+                            prev.includes(id) 
+                              ? prev.filter(i => i !== id)
+                              : [...prev, id]
+                          )
+                        }}
                       />
                     ))}
+
+                    {/* Company Timeline */}
+                    {company.timeline && company.timeline.length > 0 ? (
+                      company.timeline.map((item) => (
+                        <TimelineCard 
+                          key={item.id} 
+                          item={item} 
+                          isExpanded={expandedTimelineItems.includes(item.id)}
+                          onToggleExpand={(id) => {
+                            setExpandedTimelineItems(prev =>
+                              prev.includes(id) 
+                                ? prev.filter(i => i !== id)
+                                : [...prev, id]
+                            )
+                          }}
+                        />))
+                    ) : (
+                      <Card className="bg-[#1A1A1A] border-[#2F2F2F]">
+                        <CardContent className="py-6">
+                          <p className="text-center text-muted-foreground">No timeline entries available</p>
+                        </CardContent>
+                      </Card>
+                    )}
                   </div>
                 </>
               )}
