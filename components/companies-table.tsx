@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/tooltip"
 // import { SourceIcon } from "./source-icon"
 import { TrendLine } from "./trend-line"
+
 import Image from "next/image"
 import { DndProvider, useDrag, useDrop } from "react-dnd"
 import { HTML5Backend } from "react-dnd-html5-backend"
@@ -38,8 +39,8 @@ const columnLabels = {
   name: "Name",
   lastActivity: "Last Activity",
   usageTrend: "Usage (L30D)",
-  tickets: "Tickets",
-  sentiment: "Sentiment (L30D)",
+  tickets: "Messages (L7D)",
+  sentiment: "Sentiment (real-time)",
   activeProjects: "Active Projects",
   status: "Status",
 }

@@ -3,7 +3,6 @@
 import { HelpCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useBeacons } from '@/contexts/beacon-context'
-
 export function Header() {
   const { resetBeacons } = useBeacons()
   return (
@@ -25,4 +24,3 @@ export function Header() {
     </header>
   )
 }
-

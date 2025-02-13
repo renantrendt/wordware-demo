@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
-import { MessageSquare, Video, ChevronDown } from "lucide-react"
+import { MessageSquare, Video, ChevronDown, AlertCircle, ListChecks } from "lucide-react"
 
 interface TimelineItem {
   id: string
@@ -11,6 +11,13 @@ interface TimelineItem {
   title: string
   timestamp: string
   summary: string
+  payload?: {
+    summary: string
+    overall_sentiment: 'positive' | 'neutral' | 'negative'
+    urgent_matters: string[]
+    key_topics: string[]
+    action_items: string[]
+  }
 }
 
 interface TimelineCardProps {
@@ -26,9 +33,6 @@ export function TimelineCard({ item, isExpanded: controlledExpanded, onToggleExp
 
   const handleCommentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setComment(e.target.value)
-    // Aqui você implementaria a lógica de salvamento automático
-    // Por exemplo, usando um debounce para não salvar a cada tecla
-    // saveComment(item.id, e.target.value)
   }
 
   return (
@@ -61,10 +65,58 @@ export function TimelineCard({ item, isExpanded: controlledExpanded, onToggleExp
         </div>
         {isExpanded && (
           <div className="mt-4 space-y-4">
+            {/* Summary */}
             <div>
               <h4 className="text-sm font-medium text-white mb-2">AI Summary</h4>
               <p className="text-sm text-muted-foreground">{item.summary}</p>
             </div>
+
+            {/* Key Topics */}
+            {item.payload?.key_topics && item.payload.key_topics.length > 0 && (
+              <div>
+                <h4 className="text-sm font-medium text-white mb-2 flex items-center gap-2">
+                  <MessageSquare className="w-4 h-4" />
+                  Key Topics
+                </h4>
+                <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
+                  {item.payload.key_topics.map((topic, index) => (
+                    <li key={index}>{topic}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Action Items */}
+            {item.payload?.action_items && item.payload.action_items.length > 0 && (
+              <div>
+                <h4 className="text-sm font-medium text-white mb-2 flex items-center gap-2">
+                  <ListChecks className="w-4 h-4" />
+                  Action Items
+                </h4>
+                <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
+                  {item.payload.action_items.map((action, index) => (
+                    <li key={index}>{action}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Urgent Matters */}
+            {item.payload?.urgent_matters && item.payload.urgent_matters.length > 0 && (
+              <div>
+                <h4 className="text-sm font-medium text-red-400 mb-2 flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4" />
+                  Urgent Matters
+                </h4>
+                <ul className="list-disc list-inside text-sm text-red-400 space-y-1">
+                  {item.payload.urgent_matters.map((matter, index) => (
+                    <li key={index}>{matter}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Comments */}
             <div>
               <h4 className="text-sm font-medium text-white mb-2">Comments</h4>
               <Textarea

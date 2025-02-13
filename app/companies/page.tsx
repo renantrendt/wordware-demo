@@ -3,6 +3,7 @@
 import { useState, useMemo, useEffect } from "react"
 import { supabase } from '@/lib/supabase'
 import { Database } from '@/types/supabase'
+import { getTodayTickets, summarizeTickets } from '@/lib/wordware-tickets'
 
 // Converte o sentiment score do Wordware em High/Medium/Low
 function getSentimentFromScore(score: number): "High" | "Medium" | "Low" {
@@ -13,6 +14,23 @@ function getSentimentFromScore(score: number): "High" | "Medium" | "Low" {
 import { CompaniesTable } from "@/components/companies-table"
 import { CompaniesHeader } from "@/components/companies-header"
 import { DetailsSidebar } from "@/components/details-sidebar"
+
+// Tipos base para reutilização
+interface Project {
+  id: string
+  name: string
+  usage: number
+  lastActiveDate: string
+  usageTrend: number[]
+}
+
+interface TimelineEvent {
+  id: string
+  type: "chat" | "videocall"
+  title: string
+  timestamp: string
+  summary: string
+}
 
 interface Company {
   name: string
@@ -25,20 +43,8 @@ interface Company {
   source: "salesforce" | "hubspot" | "csv" | "zendesk"
   employees?: string
   recordOwner?: string
-  projects?: {
-    id: string
-    name: string
-    usage: number
-    lastActiveDate: string
-    usageTrend: number[]
-  }[]
-  timeline?: {
-    id: string
-    type: "chat" | "videocall"
-    title: string
-    timestamp: string
-    summary: string
-  }[]
+  projects?: Project[]
+  timeline?: TimelineEvent[]
 }
 
 const initialCompanies: Company[] = [
@@ -142,13 +148,23 @@ export default function CompaniesPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [sortColumn, setSortColumn] = useState("lastActivity")
 
-  // Busca o último sentiment_score a cada 5 segundos
-  useEffect(() => {
+  // Constantes
+  const WEBSITE_ID = '48dd6d16-b2eb-4c46-8cb6-4214e897d9c9'
+  const UPDATE_INTERVAL = 5000
+  const DAYS_TO_FETCH = 7
 
-    const fetchSentiment = async () => {
+  // Busca sentiment, tickets e gera sumarização periodicamente
+  useEffect(() => {
+    let isSubscribed = true
+    console.log('Iniciando intervalo de busca')
+
+    const fetchData = async () => {
+      if (!isSubscribed) return
+      console.log('Executando busca de dados...')
+
       try {
-        // Busca o último log do Wordware
-        const { data, error } = await supabase
+        // Busca o último sentiment analysis
+        const { data: sentimentData, error: sentimentError } = await supabase
           .from('logs')
           .select('*')
           .eq('source', 'wordware')
@@ -156,40 +172,85 @@ export default function CompaniesPage() {
           .order('timestamp', { ascending: false })
           .limit(1)
 
-        if (error) throw error
+        if (sentimentError) throw sentimentError
 
-        if (data && data.length > 0) {
-          const analysis = data[0].payload
-          
-          // Atualiza o sentiment e o timeline do QuantumLeap AI
+        // Busca os tickets dos últimos dias para o gráfico
+        const sevenDaysAgo = new Date()
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - DAYS_TO_FETCH)
+        
+        const { data: ticketsData, error: ticketsError } = await supabase
+          .from('logs')
+          .select('*')
+          .eq('source', 'crisp')
+          .in('event_type', ['message:send', 'message:received'])
+          .eq('website_id', WEBSITE_ID)
+          .gte('timestamp', sevenDaysAgo.toISOString())
+          .order('timestamp', { ascending: true })
+
+        if (ticketsError) throw ticketsError
+
+        // Processa os tickets em contagens diárias para o gráfico
+        const dailyCounts = new Array(DAYS_TO_FETCH).fill(0)
+        ticketsData?.forEach(log => {
+          const dayIndex = (DAYS_TO_FETCH - 1) - Math.floor(
+            (new Date().getTime() - new Date(log.timestamp).getTime()) / (1000 * 60 * 60 * 24)
+          )
+          if (dayIndex >= 0 && dayIndex < DAYS_TO_FETCH) {
+            dailyCounts[dayIndex]++
+          }
+        })
+
+        // Verifica se há novos tickets para resumir
+        const todayTickets = await getTodayTickets()
+        if (todayTickets.length > 0) {
+          await summarizeTickets(todayTickets)
+        }
+        
+        // Atualiza o estado das empresas apenas se ainda estivermos inscritos
+        if (isSubscribed) {
           setCompanies(prevCompanies => 
             prevCompanies.map(company => 
               company.name === "QuantumLeap AI" 
                 ? {
                     ...company,
-                    sentiment: analysis.sentiment_score,
-                    timeline: [{
-                      id: "1",
-                      type: "chat",
-                      title: "Support Inquiry",
-                      timestamp: data[0].timestamp ? new Date(data[0].timestamp).toLocaleString() : "Just now",
-                      summary: analysis.summary || "Waiting for customer message..."
-                    }]
+                    sentiment: sentimentData?.[0]?.payload?.sentiment_score ?? company.sentiment,
+                    tickets: dailyCounts
                   }
                 : company
             )
           )
         }
       } catch (error) {
-        console.error('Erro ao buscar sentiment:', error)
+        console.error('Erro ao buscar dados:', error)
       }
     }
 
-    // Busca imediatamente e depois a cada 5 segundos
-    fetchSentiment()
-    const interval = setInterval(fetchSentiment, 5000)
+    // Configura subscription para atualizações em tempo real
+    console.log('Configurando subscription do Supabase')
+    const subscription = supabase
+      .channel('logs-channel')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'logs',
+          filter: `source=eq.crisp AND (event_type=eq.message:send OR event_type=eq.message:received) AND website_id=eq.${WEBSITE_ID}`
+        },
+        fetchData // Reutiliza a mesma função
+      )
+      .subscribe()
 
-    return () => clearInterval(interval)
+    // Busca inicial e configura intervalo
+    fetchData()
+    const interval = setInterval(fetchData, UPDATE_INTERVAL)
+
+    return () => {
+      console.log('Limpando recursos...')
+      isSubscribed = false
+      clearInterval(interval)
+      subscription.unsubscribe()
+    }
   }, [])
 
   const [selectedColumns, setSelectedColumns] = useState([

@@ -11,11 +11,14 @@ import {
 } from "@/components/ui/tooltip"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { TrendLine } from "./trend-line"
+import { TrendLineWithTooltip } from "./trend-line-with-tooltip"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { TimelineCard } from "./timeline-card"
 import { ChevronDown, ChevronUp } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { useTicketSummaries } from "@/hooks/use-ticket-summaries"
+import { format } from "date-fns"
 
 interface Company {
   name: string
@@ -59,6 +62,28 @@ export function DetailsSidebar({ isOpen, onClose, company, onNavigate, hasPrevio
   const [isIntentTrendExpanded, setIsIntentTrendExpanded] = useState(true)
   const [isTimelineExpanded, setIsTimelineExpanded] = useState(true)
   const [expandedTimelineItems, setExpandedTimelineItems] = useState<string[]>([])
+  const realTicketSummaries = useTicketSummaries()
+  
+  // Mock data for other companies
+  const mockTicketSummaries = [
+    {
+      timestamp: "2024-02-12T10:00:00Z",
+      message_content: "3 new feature requests received. Customer satisfaction remains high. No critical issues reported.",
+      payload: { sentiment: "positive", priority: "low" }
+    },
+    {
+      timestamp: "2024-02-11T10:00:00Z",
+      message_content: "Minor UI feedback collected. Team is addressing cosmetic improvements. All core features working as expected.",
+      payload: { sentiment: "neutral", priority: "low" }
+    },
+    {
+      timestamp: "2024-02-10T10:00:00Z",
+      message_content: "Regular check-in with the customer success team. No issues reported. Usage metrics stable.",
+      payload: { sentiment: "positive", priority: "low" }
+    }
+  ]
+
+  const ticketSummaries = company?.name === "QuantumLeap AI" ? realTicketSummaries : mockTicketSummaries
 
   useEffect(() => {
     if (isOpen && company) {
@@ -228,12 +253,9 @@ export function DetailsSidebar({ isOpen, onClose, company, onNavigate, hasPrevio
                                 timelineSection.scrollIntoView({ behavior: 'smooth', block: 'center' })
                                 // Expand timeline if not expanded
                                 setIsTimelineExpanded(true)
-                                // Find and expand the first Support Inquiry
-                                if (company.timeline && company.timeline.length > 0) {
-                                  const supportInquiry = company.timeline.find(item => item.title === 'Support Inquiry')
-                                  if (supportInquiry) {
-                                    setExpandedTimelineItems(prev => [...prev, supportInquiry.id])
-                                  }
+                                // Expand all Daily Support Summaries
+                                if (ticketSummaries.length > 0) {
+                                  setExpandedTimelineItems(ticketSummaries.map(summary => summary.timestamp))
                                 }
                               }
                             }}
@@ -265,36 +287,42 @@ export function DetailsSidebar({ isOpen, onClose, company, onNavigate, hasPrevio
                 <>
                   <Card id="timeline-section" className="bg-[#1A1A1A] border-[#2F2F2F] mb-4">
                     <CardHeader className="pb-2">
-                      <CardTitle className="text-lg font-medium text-white">Support Tickets Opened</CardTitle>
+                      <CardTitle className="text-lg font-medium text-white">Support Messages Received</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="h-[60px]">
-                        <TrendLine data={company.tickets} color="#FF5D0A" height={60} width="100%" />
+                        <TrendLineWithTooltip 
+                          data={company?.name === "QuantumLeap AI" ? company.tickets : [2, 3, 1, 4, 2, 3, 2, 1, 3, 2]} 
+                          color="#FF5D0A" 
+                          height={60} 
+                          width="100%" 
+                        />
                       </div>
                     </CardContent>
                   </Card>
                   <div className="space-y-4">
-                    {company.timeline && company.timeline.length > 0 ? (
-                      company.timeline.map((item) => (
-                        <TimelineCard 
-                          key={item.id} 
-                          item={item} 
-                          isExpanded={expandedTimelineItems.includes(item.id)}
-                          onToggleExpand={(id) => {
-                            setExpandedTimelineItems(prev =>
-                              prev.includes(id) 
-                                ? prev.filter(i => i !== id)
-                                : [...prev, id]
-                            )
-                          }}
-                        />))
-                    ) : (
-                      <Card className="bg-[#1A1A1A] border-[#2F2F2F]">
-                        <CardContent className="py-6">
-                          <p className="text-center text-muted-foreground">No timeline entries available</p>
-                        </CardContent>
-                      </Card>
-                    )}
+                    {/* Daily Support Summaries */}
+                    {ticketSummaries.map((summary) => (
+                      <TimelineCard
+                        key={summary.timestamp}
+                        item={{
+                          id: summary.timestamp,
+                          type: "chat",
+                          title: "Daily Support Summary",
+                          timestamp: format(new Date(summary.timestamp), 'MMM dd, yyyy HH:mm'),
+                          summary: summary.message_content,
+                          payload: summary.payload
+                        }}
+                        isExpanded={expandedTimelineItems.includes(summary.timestamp)}
+                        onToggleExpand={(id) => {
+                          setExpandedTimelineItems(prev =>
+                            prev.includes(id) 
+                              ? prev.filter(i => i !== id)
+                              : [...prev, id]
+                          )
+                        }}
+                      />
+                    ))}
                   </div>
                 </>
               )}
