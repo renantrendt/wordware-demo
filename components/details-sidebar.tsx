@@ -1,14 +1,24 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useBeacons } from '@/contexts/beacon-context'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { TrendLine } from "./trend-line"
+import { TrendLineWithTooltip } from "./trend-line-with-tooltip"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { TimelineCard } from "./timeline-card"
 import { ChevronDown, ChevronUp } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { useTicketSummaries } from "@/hooks/use-ticket-summaries"
+import { format } from "date-fns"
 
 interface Company {
   name: string
@@ -47,9 +57,12 @@ interface DetailsSidebarProps {
 }
 
 export function DetailsSidebar({ isOpen, onClose, company, onNavigate, hasPrevious, hasNext }: DetailsSidebarProps) {
+  const { showTimelineBeacon, setShowTimelineBeacon } = useBeacons()
   const [isGraphLoaded, setIsGraphLoaded] = useState(false)
   const [isIntentTrendExpanded, setIsIntentTrendExpanded] = useState(true)
   const [isTimelineExpanded, setIsTimelineExpanded] = useState(true)
+  const [expandedTimelineItems, setExpandedTimelineItems] = useState<string[]>([])
+  const ticketSummaries = useTicketSummaries()
 
   useEffect(() => {
     if (isOpen && company) {
@@ -204,7 +217,49 @@ export function DetailsSidebar({ isOpen, onClose, company, onNavigate, hasPrevio
 
             <div>
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold text-white">Timeline</h2>
+                <div className="flex items-center gap-1">
+                  <h2 className="text-xl font-semibold text-white">Timeline</h2>
+                  {company.name === "QuantumLeap AI" && showTimelineBeacon && (
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div 
+                            className="ml-1 cursor-pointer" 
+                            onClick={() => {
+                              setShowTimelineBeacon(false)
+                              const timelineSection = document.getElementById('timeline-section')
+                              if (timelineSection) {
+                                timelineSection.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                                // Expand timeline if not expanded
+                                setIsTimelineExpanded(true)
+                                // Find and expand the first Support Inquiry
+                                if (company.timeline && company.timeline.length > 0) {
+                                  const supportInquiry = company.timeline.find(item => item.title === 'Support Inquiry')
+                                  if (supportInquiry) {
+                                    setExpandedTimelineItems(prev => [...prev, supportInquiry.id])
+                                  }
+                                }
+                              }
+                            }}
+                          >
+                            <div className="relative flex items-center justify-center">
+                              {/* Outer ring with animation */}
+                              <div className="absolute w-4 h-4 bg-white rounded-full opacity-40 animate-ping" />
+                              {/* Inner dot */}
+                              <div className="relative w-3 h-3 bg-white rounded-full opacity-90" />
+                            </div>
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent 
+                          side="right"
+                          className="bg-[#1A1A1A] text-white border-[#2F2F2F] text-sm max-w-[200px]"
+                        >
+                          View support inquiries and timeline
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  )}
+                </div>
                 <ChevronDown
                   className={`h-5 w-5 cursor-pointer transition-transform ${isTimelineExpanded ? "rotate-180" : ""}`}
                   onClick={() => setIsTimelineExpanded(!isTimelineExpanded)}
@@ -214,24 +269,29 @@ export function DetailsSidebar({ isOpen, onClose, company, onNavigate, hasPrevio
                 <>
                   <Card className="bg-[#1A1A1A] border-[#2F2F2F] mb-4">
                     <CardHeader className="pb-2">
-                      <CardTitle className="text-lg font-medium text-white">Support Tickets Opened</CardTitle>
+                      <CardTitle className="text-lg font-medium text-white">Support Messages Received</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="h-[60px]">
-                        <TrendLine data={company.tickets} color="#FF5D0A" height={60} width="100%" />
+                        <TrendLineWithTooltip data={company.tickets} color="#FF5D0A" height={60} width="100%" />
                       </div>
                     </CardContent>
                   </Card>
                   <div className="space-y-4">
-                    {company.timeline && company.timeline.length > 0 ? (
-                      company.timeline.map((item) => <TimelineCard key={item.id} item={item} />)
-                    ) : (
-                      <Card className="bg-[#1A1A1A] border-[#2F2F2F]">
-                        <CardContent className="py-6">
-                          <p className="text-center text-muted-foreground">No timeline entries available</p>
-                        </CardContent>
-                      </Card>
-                    )}
+                    {/* Ticket Summaries */}
+                    {ticketSummaries.map((summary) => (
+                      <TimelineCard
+                        key={summary.timestamp}
+                        item={{
+                          id: summary.timestamp,
+                          type: "chat",
+                          title: "Daily Support Summary",
+                          timestamp: format(new Date(summary.timestamp), 'MMM dd, yyyy HH:mm'),
+                          summary: summary.message_content,
+                          payload: summary.payload
+                        }}
+                      />
+                    ))}
                   </div>
                 </>
               )}

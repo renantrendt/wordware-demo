@@ -3,10 +3,18 @@
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table"
 // import { SourceIcon } from "./source-icon"
 import { TrendLine } from "./trend-line"
+
 import Image from "next/image"
 import { DndProvider, useDrag, useDrop } from "react-dnd"
 import { HTML5Backend } from "react-dnd-html5-backend"
 import { CustomDragLayer } from "./custom-drag-layer"
+import { useBeacons } from '@/contexts/beacon-context'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 
 interface Company {
   name: string
@@ -30,8 +38,8 @@ const columnLabels = {
   name: "Name",
   lastActivity: "Last Activity",
   usageTrend: "Usage (L30D)",
-  tickets: "Tickets",
-  sentiment: "Sentiment (L30D)",
+  tickets: "Messages (L7D)",
+  sentiment: "Sentiment (real-time)",
   activeProjects: "Active Projects",
   status: "Status",
 }
@@ -77,6 +85,7 @@ const DraggableTableHead = ({ columnId, onColumnReorder, className = "" }) => {
 }
 
 export function CompaniesTable({ companies, selectedColumns, onRowClick, onColumnReorder }: CompaniesTableProps) {
+  const { showSentimentBeacon, setShowSentimentBeacon } = useBeacons()
   return (
     <DndProvider backend={HTML5Backend}>
       <div className="overflow-x-auto -mx-6 whitespace-nowrap">
@@ -158,6 +167,31 @@ export function CompaniesTable({ companies, selectedColumns, onRowClick, onColum
                         >
                           {typeof company.sentiment === 'number' ? `${(company.sentiment * 100).toFixed(0)}%` : '-'}
                         </span>
+                        {company.name === "QuantumLeap AI" && showSentimentBeacon && (
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <div 
+                                  className="ml-1 cursor-pointer" 
+                                  onClick={() => setShowSentimentBeacon(false)}
+                                >
+                                  <div className="relative flex items-center justify-center">
+                                    {/* Outer ring with animation */}
+                                    <div className="absolute w-4 h-4 bg-white rounded-full opacity-40 animate-ping" />
+                                    {/* Inner dot */}
+                                    <div className="relative w-3 h-3 bg-white rounded-full opacity-90" />
+                                  </div>
+                                </div>
+                              </TooltipTrigger>
+                              <TooltipContent 
+                                side="right"
+                                className="bg-[#1A1A1A] text-white border-[#2F2F2F] text-sm whitespace-nowrap"
+                              >
+                                View customer real-time sentiment
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        )}
                       </div>
                     )}
                     {columnId === "activeProjects" && <span className="text-sm">{company.activeProjects}</span>}

@@ -1,6 +1,6 @@
 "use client"
 
-import { Search, ArrowUpDown, Table2 } from "lucide-react"
+import { Search, ArrowUpDown, Table2, HelpCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { ImportButton } from "@/components/import-button"
 import { useState } from "react"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 const columns = [
   { id: "name", label: "Name" },
@@ -42,11 +43,33 @@ export function CompaniesHeader({
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold">Companies</h1>
-          <p className="text-sm text-muted-foreground">{totalCompanies.toLocaleString()} companies</p>
+        <div className="flex items-center gap-3">
+          <div>
+            <h1 className="text-2xl font-bold">Companies</h1>
+            <p className="text-sm text-muted-foreground">{totalCompanies.toLocaleString()} companies</p>
+          </div>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-muted-foreground hover:text-white"
+                  onClick={() => window.open('https://docs.wordware.ai/companies', '_blank')}
+                >
+                  <HelpCircle className="h-5 w-5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>View documentation</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
-        <ImportButton importType="Companies" />
+        <div className="flex items-center gap-2">
+
+          <ImportButton importType="Companies" />
+        </div>
       </div>
       <div className="flex items-center gap-2">
         <div className="relative flex-1">
