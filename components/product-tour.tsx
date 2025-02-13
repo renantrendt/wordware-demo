@@ -75,7 +75,7 @@ function WelcomeModal({ onClose }: { onClose: () => void }) {
           </CardHeader>
           <CardContent>
           <p className="mb-4 text-sm text-neutral-400">
-          Currently, the only operational feature is the sentiment analysis you can find it at the cell sentiment inside Companies page, along with its corresponding log on the logs page.
+          Currently, the only operational features are the sentiment analysis you can find it at the cell sentiment inside companies page; timeline with real-time chart showing messages received per day and daily support tickets summarization with action; API logs on the logs page.
             </p>
             <p className="mb-4 text-sm text-neutral-400">
             Tip: The flashing beacons are the parts of the software that are working, you can hover over them to understand their functionality.
@@ -90,7 +90,7 @@ function WelcomeModal({ onClose }: { onClose: () => void }) {
               <strong className="text-white">Wordware Teammate:</strong> You work at Wordware and today you are focused on determining if some customers are at risk of churning. You begin by analyzing the sentiment and summary of the previous ticket from the company QuantumLeap.
             </p>
             <div className="mb-4 text-xs text-neutral-300">
-              <p className="mb-2">Built in 31 hours using:</p>
+              <p className="mb-2">Built in 36 hours using:</p>
               <ul className="list-none space-y-1">
                 <li>• Framework: Next.js, React, TypeScript</li>
                 <li>• UI: Tailwind, shadcn/ui, React DND, Tremor</li>
