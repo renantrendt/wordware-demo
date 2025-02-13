@@ -9,7 +9,7 @@ export function Header() {
   return (
     <header className="bg-background border-b border-border py-4 px-6">
       <div className="flex justify-between items-center">
-        <div />
+        <div></div>
         <Button
           variant="ghost"
           size="icon"
@@ -25,4 +25,3 @@ export function Header() {
     </header>
   )
 }
-

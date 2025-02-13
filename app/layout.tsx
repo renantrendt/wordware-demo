@@ -28,13 +28,13 @@ export default function RootLayout({
       <body>
         <BeaconProvider>
           <div className="flex h-screen bg-[#121212] text-white font-inter">
-            <Sidebar />
-            <div className="flex-1 flex flex-col overflow-hidden">
-              <Header />
-              <main className="flex-1 overflow-auto">{children}</main>
-            </div>
-            <CrispChat />
-            <ProductTour />
+          <Sidebar />
+          <div className="flex-1 flex flex-col overflow-hidden">
+            <Header />
+            <main className="flex-1 overflow-auto">{children}</main>
+          </div>
+          <CrispChat />
+          <ProductTour />
           </div>
         </BeaconProvider>
       </body>
