@@ -20,6 +20,8 @@ export async function POST(req: Request) {
 
     console.log('Parsed Twilio message:', messageData)
 
+    console.log('Received request:', { body: messageData });
+
     // Criar entrada de log
     const logEntry = {
       source: 'twilio',
